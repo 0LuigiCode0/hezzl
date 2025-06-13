@@ -1,0 +1,150 @@
+# version: "3.9"
+services:
+# -------------------------------------------------------------------------- #
+# MARK:postgres
+# -------------------------------------------------------------------------- #
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: test
+    volumes:
+      - ~/.environment/postgres/db:/var/lib/postgresql/data
+    extra_hosts:
+      - host.docker.internal=host-gateway
+  pg-admin:
+    image: adminer
+    container_name: pg-admin
+    restart: always
+    ports:
+      - 8081:8080 
+    extra_hosts:
+      - host.docker.internal=host-gateway
+      
+# -------------------------------------------------------------------------- #
+# MARK:redis
+# -------------------------------------------------------------------------- #
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - 6379:6379
+    command:
+      [
+        "redis-server",
+        "--appendonly yes",
+        "--repl-diskless-load on-empty-db",
+        "--replica-announce-ip host.docker.internal",
+        "--replica-announce-port 6379",
+        "--protected-mode no",
+        "--requirepass admin",
+      ]
+    volumes:
+      - ~/.environment/redis/db:/data
+    extra_hosts:
+      - host.docker.internal=host-gateway
+  redis-sentinel:
+    image: redis:latest
+    container_name: redis-sentinel
+    restart: always
+    ports:
+      - 26379:26379
+    command: >
+      sh -c 'echo "" > /etc/sentinel.conf && 
+            echo "sentinel monitor mymaster host.docker.internal 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel announce-hostnames yes" >> /etc/sentinel.conf &&
+            echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            echo "sentinel auth-pass mymaster admin" >> /etc/sentinel.conf  &&
+            redis-server /etc/sentinel.conf --sentinel'
+    volumes:
+      - ~/.environment/redis/sentinel:/data
+    extra_hosts:
+      - host.docker.internal=host-gateway
+  redis-redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redis-redisinsight
+    restart: always
+    ports:
+      - 8082:5540
+    volumes:
+      - ~/.environment/redis/redisinsight:/data
+    extra_hosts:
+      - host.docker.internal=host-gateway
+
+# -------------------------------------------------------------------------- #
+# MARK:nats
+# -------------------------------------------------------------------------- #
+
+  nats:
+    image: nats:latest
+    container_name: nats
+    command: "-V --http_port 8222 --user admin --pass admin --sd /data -js -sd /data"
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    volumes:
+      - ~/.environment/nats/db:/data
+    extra_hosts:
+      - host.docker.internal=host-gateway
+  nats-ui:
+    container_name: nats-ui
+    image: ghcr.io/nats-nui/nui:latest
+    ports:  
+      - "8083:31311"
+    volumes:
+      - ~/.environment/nats/ui:/data
+    extra_hosts:
+      - host.docker.internal=host-gateway
+
+# -------------------------------------------------------------------------- #
+# MARK:ClickHouse
+# -------------------------------------------------------------------------- #
+    
+  clickhouse:
+    image: clickhouse:latest
+    container_name: clickhouse
+    user: "101:101"
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_DB: test
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: admin
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      CLICKHOUSE_LOG_LEVEL: trace
+    volumes:
+      - chdb:/var/lib/clickhouse:rw
+      - ~/.environment/clickhouse/log:/var/log/clickhouse-server
+    extra_hosts:
+      - host.docker.internal=host-gateway
+  clickhouse-ui:
+    container_name: clickhouse-ui
+    image: ghcr.io/caioricciuti/ch-ui:latest
+    ports:  
+      - "8084:5521"
+    environment:
+      VITE_CLICKHOUSE_URL: "http://host.docker.internal:8123"
+      VITE_CLICKHOUSE_USER: admin
+      VITE_CLICKHOUSE_PASS: admin
+    extra_hosts:
+      - host.docker.internal=host-gateway
+
+networks:
+  default:
+    enable_ipv6: false
+
+volumes:
+  chdb:
+    driver: local
