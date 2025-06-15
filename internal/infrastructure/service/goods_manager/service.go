@@ -44,7 +44,7 @@ func Start(ctx context.Context) {
 		return
 	}
 
-	handler := ihttp.InitHandler(repoPostgres, repoRedis, natsStream)
+	handler := ihttp.InitHandler(ctx, repoPostgres, repoRedis, natsStream)
 
 	l, err := net.ListenTCP("tcp4", &net.TCPAddr{Port: config.Cfg.Port})
 	if err != nil {

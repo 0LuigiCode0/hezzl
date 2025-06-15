@@ -26,8 +26,9 @@ const (
 	urlGoodList   = "GET /goods/list"
 )
 
-func InitHandler(pg rpostgres.IRepoPostgres, redis rredis.IRedis, nats bnats.IStream) http.Handler {
+func InitHandler(ctx context.Context, pg rpostgres.IRepoPostgres, redis rredis.IRedis, nats bnats.IStream) http.Handler {
 	handler := new(_handler)
+	handler.ctx = ctx
 	handler.pg = pg
 	handler.redis = redis
 	handler.nats = nats
