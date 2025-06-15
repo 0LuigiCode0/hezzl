@@ -93,6 +93,13 @@ func (h *_handler) updateGood(w http.ResponseWriter, r *http.Request) {
 		}
 		return err
 	})
+	h.withRetry(config.Cfg.Redis.RetryCount, func(ctx context.Context) error {
+		err = h.redis.DeleteAllWithGood(ctx, good.Id)
+		if err != nil {
+			log.Print(err)
+		}
+		return err
+	})
 
 	writeJson(w, 200, conv.GoodPgToResp(good))
 }
@@ -123,6 +130,13 @@ func (h *_handler) removeGood(w http.ResponseWriter, r *http.Request) {
 		}
 		return err
 	})
+	h.withRetry(config.Cfg.Redis.RetryCount, func(ctx context.Context) error {
+		err = h.redis.DeleteAllWithGood(ctx, good.Id)
+		if err != nil {
+			log.Print(err)
+		}
+		return err
+	})
 
 	writeJson(w, 200, conv.GoodPgToRemoveResp(good))
 }
@@ -141,15 +155,40 @@ func (h *_handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	goods, err := h.pg.GetGoods(r.Context(), limit, offset)
-	if err != nil {
-		writeErrorLog(w, 500, err)
-		return
+	if limit <= 0 {
+		limit = 10
 	}
+	if offset <= 0 {
+		offset = 1
+	}
+
+	var isDB bool
+	goods, err := h.redis.GetGoods(r.Context(), limit, offset)
+	if err != nil {
+		log.Print(err)
+
+		goods, err = h.pg.GetGoods(r.Context(), limit, offset)
+		if err != nil {
+			writeErrorLog(w, 500, err)
+			return
+		}
+		isDB = true
+	}
+
 	meta, err := h.pg.GetGoodsMeta(r.Context())
 	if err != nil {
 		writeErrorLog(w, 500, err)
 		return
+	}
+
+	if isDB {
+		h.withRetry(config.Cfg.Redis.RetryCount, func(ctx context.Context) error {
+			err = h.redis.PushGoods(ctx, limit, offset, goods)
+			if err != nil {
+				log.Print(err)
+			}
+			return err
+		})
 	}
 
 	writeJson(w, 200, conv.GoodsPgToRespMeta(meta, goods, limit, offset))

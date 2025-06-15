@@ -9,11 +9,10 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-const ServiceName = "goods-manager"
-
 type Config struct {
-	Port     int `json:"port" env:"PROXY_PORT" env-default:"90"`
-	Postgres struct {
+	ServiceName string `json:"service_name" env:"PROXY_SERVICE_NAME" env-default:"goods-manager"`
+	Port        int    `json:"port" env:"PROXY_PORT" env-default:"90"`
+	Postgres    struct {
 		URL string `json:"url" env:"PROXY_PG_URL" env-default:"postgres://admin:admin@localhost:5432/test"`
 	} `json:"postgres"`
 	ClickHouse struct {
@@ -39,18 +38,11 @@ type Config struct {
 		SentinelAddr string `json:"sentinel_addr" env:"PROXY_REDIS_SENTINEL_ADDR" env-default:":26379"`
 		User         string `json:"user" env:"PROXY_REDIS_USER" env-default:"default"`
 		Pwd          string `json:"pwd" env:"PROXY_REDIS_PWD" env-default:"admin"`
+
+		RetryCount int           `json:"retry_count" env:"PROXY_REDIS_RETRY_COUNT" env-default:"4"`
+		Expire     time.Duration `json:"expire" env:"PROXY_REDIS_EXPIRE" env-default:"1m"`
 	}
 }
-
-// type addrs []string
-
-// func (a *addrs) UnmarshalText(text []byte) error {
-// 	addrList := strings.Split(string(text), ",")
-// 	for _, v := range addrList {
-// 		*a = append(*a, v)
-// 	}
-// 	return nil
-// }
 
 var Cfg *Config
 

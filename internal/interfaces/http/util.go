@@ -13,7 +13,7 @@ import (
 func jsonParse[T any](data io.Reader) (*T, error) {
 	buf, err := io.ReadAll(data)
 	if err != nil {
-		return nil, fmt.Errorf(consts.ErrReadBody, err)
+		return nil, fmt.Errorf(errReadBody, err)
 	}
 
 	out := new(T)

@@ -25,9 +25,9 @@ func (s *_stream) Subscribe(ctx context.Context, subj string, nameClient string)
 	}
 	utils.AddShutdown(func() {
 		if err := sub.Drain(); err != nil {
-			log.Printf("ошибка закрытия подписчика nats: %s", err)
+			log.Printf(errUnsubscribe, err)
 		} else {
-			log.Print("подписчик nats закрыт")
+			log.Print(prefix + "подписчик nats закрыт")
 		}
 	})
 

@@ -22,8 +22,8 @@ type IClickHouse interface {
 
 func InitClickHouse(ctx context.Context) (IClickHouse, error) {
 	clConn, err := clickhouse.Open(&clickhouse.Options{
-		// Protocol: clickhouse.Native,
-		Addr: []string{config.Cfg.ClickHouse.Addr},
+		Protocol: clickhouse.Native,
+		Addr:     []string{config.Cfg.ClickHouse.Addr},
 		Auth: clickhouse.Auth{
 			Database: config.Cfg.ClickHouse.DB,
 			Username: config.Cfg.ClickHouse.User,
@@ -41,9 +41,9 @@ func InitClickHouse(ctx context.Context) (IClickHouse, error) {
 
 	utils.AddShutdown(func() {
 		if err := clConn.Close(); err != nil {
-			log.Printf("ошибка закрытия соединения clickhouse: %s", err)
+			log.Printf(prefix+consts.ErrCloseConnect, err)
 		} else {
-			log.Print("clickhouse закрыт")
+			log.Print(prefix + consts.NotifyClose)
 		}
 	})
 

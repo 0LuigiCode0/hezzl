@@ -24,14 +24,14 @@ func InitNats(ctx context.Context) (INats, error) {
 	natsConn, err := nats.Connect(
 		config.Cfg.Nats.Addr,
 		nats.UserInfo(config.Cfg.Nats.User, config.Cfg.Nats.Pwd),
-		nats.Name(config.ServiceName))
+		nats.Name(config.Cfg.ServiceName))
 	if err != nil {
 		return nil, fmt.Errorf(consts.ErrOpenConnect, err)
 	}
 
 	utils.AddShutdown(func() {
 		natsConn.Close()
-		log.Print("nats закрыт")
+		log.Print(prefix + consts.NotifyClose)
 	})
 
 	return &_nats{conn: natsConn}, nil

@@ -9,13 +9,13 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-func pushStream(s *_stream, ctx context.Context, subj string, in any) error {
+func pushStream(s nats.JetStreamContext, ctx context.Context, subj string, in any) error {
 	data, err := json.Marshal(in)
 	if err != nil {
 		return fmt.Errorf(consts.ErrJsonMarshal, err)
 	}
 
-	_, err = s.js.Publish(subj, data, nats.Context(ctx))
+	_, err = s.Publish(subj, data, nats.Context(ctx))
 	if err != nil {
 		return fmt.Errorf(errPush, subj, err)
 	}

@@ -1,16 +1,18 @@
 package rpostgres
 
 const (
-	errTxCreate   = "ошибка создания транзакции: %w"
-	errTxCommit   = "ошибка коммита транзакции: %w"
-	errTxRollback = "ошибка отката транзакции: %w"
+	prefix = "[postgres] "
 
-	errSelect  = "ошибка select: %w"
-	errScanRow = "ошибка скана строки: %w"
+	errTxCreate   = prefix + "ошибка создания транзакции: %w"
+	errTxCommit   = prefix + "ошибка коммита транзакции: %w"
+	errTxRollback = prefix + "ошибка отката транзакции: %w"
 
-	errInsertGood   = "ошибка записи товара: %w"
-	errUpdateGood   = "ошибка обновления товара: %w"
-	errRemoveGood   = "ошибка удаления товара: %w"
-	errGetGoods     = "ошибка поиска товаров: %w"
-	errGetGoodsMeta = "ошибка поиска статистики товаров: %w"
+	errSelect  = prefix + "ошибка select: %w"
+	errScanRow = prefix + "ошибка скана строки: %w"
+
+	errInsertGood   = prefix + "ошибка записи товара: %w"
+	errUpdateGood   = prefix + "ошибка обновления товара: %w"
+	errRemoveGood   = prefix + "ошибка удаления товара: %w"
+	errGetGoods     = prefix + "ошибка поиска товаров: %w"
+	errGetGoodsMeta = prefix + "ошибка поиска статистики товаров: %w"
 )

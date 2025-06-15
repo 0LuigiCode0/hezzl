@@ -39,7 +39,7 @@ func Start(ctx context.Context) {
 		log.Printf("ошибка создания/подключения к стриму %s nats: %s", config.Cfg.Nats.Stream, err)
 		return
 	}
-	consumerNats, err := natsStream.Subscribe(ctx, "log.goods", config.ServiceName)
+	consumerNats, err := natsStream.Subscribe(ctx, "log.goods", config.Cfg.ServiceName)
 	if err != nil {
 		log.Printf("ошибка создания подписчика nats: %s", err)
 		return

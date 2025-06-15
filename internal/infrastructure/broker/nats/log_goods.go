@@ -9,7 +9,7 @@ import (
 )
 
 func (s *_stream) PushGoodsLog(ctx context.Context, in *dclickhouse.LogEventGood) error {
-	err := pushStream(s, ctx, config.Cfg.Nats.Subj, in)
+	err := pushStream(s.js, ctx, config.Cfg.Nats.Subj, in)
 	if err != nil {
 		return fmt.Errorf(errInsertLog, err)
 	}

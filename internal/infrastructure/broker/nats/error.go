@@ -1,13 +1,16 @@
 package bnats
 
 const (
-	errStreamCtx  = "ошибка создания конекста стрима: %w"
-	errAddStream  = "ошибка создания стрима: %w"
-	errInfoStream = "ошибка получения статуса стрима: %w"
-	errSubscribe  = "ошибка создания подписчика: %w"
+	prefix = "[nats] "
 
-	errPush  = "ошибка отправки сообщения в топик %s: %w"
-	errFetch = "ошибка получения сообщений из топика %s: %w"
+	errStreamCtx   = prefix + "ошибка создания конекста стрима: %w"
+	errAddStream   = prefix + "ошибка создания стрима: %w"
+	errInfoStream  = prefix + "ошибка получения статуса стрима: %w"
+	errSubscribe   = prefix + "ошибка создания подписчика: %w"
+	errUnsubscribe = prefix + "ошибка закрытия подписчика nats: %s"
 
-	errInsertLog = "ошибка записи лога: %w"
+	errPush  = prefix + "ошибка отправки сообщения в топик %s: %w"
+	errFetch = prefix + "ошибка получения сообщений из топика %s: %w"
+
+	errInsertLog = prefix + "ошибка записи лога: %w"
 )

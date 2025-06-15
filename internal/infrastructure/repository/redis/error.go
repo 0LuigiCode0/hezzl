@@ -1,7 +1,15 @@
 package rredis
 
 const (
-	errRead      = "ошибка чтения redis: %w"
-	errCreateKey = "ошибка записи ключа %s redis: %w"
-	errDeleteKey = "ошибка удаления ключа %s redis: %w"
+	prefix = "[redis] "
+
+	errTx     = prefix + "ошибка выполнения транзакции: %w"
+	errExpire = prefix + "ошибка установки срока ключа %s: %w"
+
+	errReadKey   = prefix + "ошибка чтения ключа %s: %w"
+	errCreateKey = prefix + "ошибка записи ключа %s: %w"
+	errDeleteKey = prefix + "ошибка удаления ключа %s: %w"
+
+	errAddSet = prefix + "ошибка добавления в список %s: %w"
+	errRemSet = prefix + "ошибка удаления из списка %s: %w"
 )

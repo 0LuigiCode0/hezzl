@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func query[T any](db _IConn, ctx context.Context, query string, arg ...any) (*T, error) {
+func query[T any](db _IDB, ctx context.Context, query string, arg ...any) (*T, error) {
 	rows, err := db.Query(ctx, query, arg...)
 	if err != nil {
 		return nil, fmt.Errorf(errSelect, err)
@@ -24,7 +24,7 @@ func query[T any](db _IConn, ctx context.Context, query string, arg ...any) (*T,
 	return out, nil
 }
 
-func queryRows[T any](db _IConn, ctx context.Context, query string, arg ...any) ([]*T, error) {
+func queryRows[T any](db _IDB, ctx context.Context, query string, arg ...any) ([]*T, error) {
 	rows, err := db.Query(ctx, query, arg...)
 	if err != nil {
 		return nil, fmt.Errorf(errSelect, err)

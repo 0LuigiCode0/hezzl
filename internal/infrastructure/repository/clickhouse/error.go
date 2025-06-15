@@ -1,9 +1,11 @@
 package rclickhouse
 
 const (
-	errBatch       = "ошибка создания батча: %w"
-	errBatchAppend = "ошибка добавления строки батча: %w"
-	errBatchSend   = "ошибка отправки батча: %w"
+	prefix = "[clickhouse] "
 
-	errInsertGoodsLog = "ошибка записи лога товаров: %w"
+	errBatch       = prefix + "ошибка создания батча: %w"
+	errBatchAppend = prefix + "ошибка добавления строки батча: %w"
+	errBatchSend   = prefix + "ошибка отправки батча: %w"
+
+	errInsertGoodsLog = prefix + "ошибка записи лога товаров: %w"
 )

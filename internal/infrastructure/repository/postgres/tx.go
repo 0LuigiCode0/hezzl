@@ -9,12 +9,12 @@ import (
 )
 
 type _tx struct {
-	_db
+	_repo
 	tx pgx.Tx
 }
 
 type ITx interface {
-	_IDB
+	_IRepo
 
 	Commit(ctx context.Context) error
 	Rollback(ctx context.Context) error
@@ -27,7 +27,7 @@ func (pg *_postgres) Begin(ctx context.Context) (ITx, error) {
 		return nil, fmt.Errorf(errTxCreate, err)
 	}
 
-	return &_tx{_db: _db{tx}, tx: tx}, nil
+	return &_tx{_repo: _repo{tx}, tx: tx}, nil
 }
 
 func (tx *_tx) Commit(ctx context.Context) error {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/0LuigiCode0/hezzl/config"
 	"github.com/0LuigiCode0/hezzl/internal/domain/consts"
+	dpostgres "github.com/0LuigiCode0/hezzl/internal/domain/postgres"
 	"github.com/0LuigiCode0/hezzl/internal/utils"
 	"github.com/redis/go-redis/v9"
 )
@@ -15,7 +16,11 @@ type _redis struct {
 	conn *redis.Client
 }
 
-type IRedis interface{}
+type IRedis interface {
+	PushGoods(ctx context.Context, limit, offset int, goods []*dpostgres.Good) error
+	GetGoods(ctx context.Context, limit, offset int) ([]*dpostgres.Good, error)
+	DeleteAllWithGood(ctx context.Context, id int) error
+}
 
 func InitRedis(ctx context.Context) (IRedis, error) {
 	redisConn := redis.NewFailoverClient(&redis.FailoverOptions{
@@ -23,7 +28,7 @@ func InitRedis(ctx context.Context) (IRedis, error) {
 		SentinelAddrs: []string{config.Cfg.Redis.SentinelAddr},
 		Username:      config.Cfg.Redis.User,
 		Password:      config.Cfg.Redis.Pwd,
-		ClientName:    config.ServiceName,
+		ClientName:    config.Cfg.ServiceName,
 	})
 
 	resp := redisConn.Ping(ctx)
@@ -34,9 +39,9 @@ func InitRedis(ctx context.Context) (IRedis, error) {
 
 	utils.AddShutdown(func() {
 		if err := redisConn.Close(); err != nil {
-			log.Printf("ошибка закрытия соединения redis: %s", err)
+			log.Printf(prefix+consts.ErrCloseConnect, err)
 		} else {
-			log.Print("redis закрыт")
+			log.Print(prefix + consts.NotifyClose)
 		}
 	})
 

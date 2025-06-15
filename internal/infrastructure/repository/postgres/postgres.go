@@ -13,17 +13,17 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-type _IConn interface {
+type _IDB interface {
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 	Exec(ctx context.Context, sql string, arguments ...any) (commandTag pgconn.CommandTag, err error)
 }
 
-type _db struct {
-	db _IConn
+type _repo struct {
+	db _IDB
 }
 
-type _IDB interface {
+type _IRepo interface {
 	GetGoods(ctx context.Context, limit, offset int) ([]*dpostgres.Good, error)
 	GetGoodsMeta(ctx context.Context) (*dpostgres.Meta, error)
 	InsertGood(ctx context.Context, in *dpostgres.InsertGood) (*dpostgres.Good, error)
@@ -32,12 +32,12 @@ type _IDB interface {
 }
 
 type _postgres struct {
-	_db
+	_repo
 	conn *pgx.Conn
 }
 
 type IRepoPostgres interface {
-	_IDB
+	_IRepo
 
 	Begin(ctx context.Context) (ITx, error)
 }
@@ -49,11 +49,11 @@ func InitRepoPostgres(ctx context.Context) (IRepoPostgres, error) {
 	}
 	utils.AddShutdown(func() {
 		if err := pgConn.Close(context.Background()); err != nil {
-			log.Printf("ошибка закрытия соединения postgres: %s", err)
+			log.Printf(prefix+consts.ErrCloseConnect, err)
 		} else {
-			log.Print("postgres закрыт")
+			log.Print(prefix + consts.NotifyClose)
 		}
 	})
 
-	return &_postgres{conn: pgConn, _db: _db{pgConn}}, nil
+	return &_postgres{conn: pgConn, _repo: _repo{pgConn}}, nil
 }

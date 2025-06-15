@@ -2,6 +2,7 @@ package rclickhouse
 
 import (
 	"context"
+	"fmt"
 )
 
 const (
@@ -9,5 +10,10 @@ const (
 )
 
 func (ch *_clickhouse) InsertGoodsLogBatch(ctx context.Context) (IBatch, error) {
-	return ch.createBatch(ctx, qInsertGoodsLog)
+	res, err := ch.createBatch(ctx, qInsertGoodsLog)
+	if err != nil {
+		return nil, fmt.Errorf(errInsertGoodsLog, err)
+	}
+
+	return res, nil
 }
