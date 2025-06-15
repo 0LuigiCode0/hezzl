@@ -1,11 +1,36 @@
 # version: "3.9"
 services:
 # -------------------------------------------------------------------------- #
+# MARK:goods_manager
+# -------------------------------------------------------------------------- #
+  goods_manager:
+    build:
+      dockerfile: ./cmd/goods_manager/Dockerfile
+      context: .
+    container_name: goods_manager
+    restart: always
+    ports:
+      - 90:90
+    extra_hosts:
+      - host.docker.internal=host-gateway
+
+# -------------------------------------------------------------------------- #
+# MARK:log_manager
+# -------------------------------------------------------------------------- #
+  log_manager:
+    build:
+      dockerfile: ./cmd/log_manager/Dockerfile
+      context: .
+    container_name: log_manager
+    restart: always
+    extra_hosts:
+      - host.docker.internal=host-gateway
+
+# -------------------------------------------------------------------------- #
 # MARK:postgres
 # -------------------------------------------------------------------------- #
-
   postgres:
-    image: postgres
+    image: postgres:alpine
     container_name: postgres
     restart: always
     ports:
@@ -30,9 +55,8 @@ services:
 # -------------------------------------------------------------------------- #
 # MARK:redis
 # -------------------------------------------------------------------------- #
-
   redis:
-    image: redis:latest
+    image: redis:alpine
     container_name: redis
     restart: always
     ports:
@@ -52,7 +76,7 @@ services:
     extra_hosts:
       - host.docker.internal=host-gateway
   redis-sentinel:
-    image: redis:latest
+    image: redis:alpine
     container_name: redis-sentinel
     restart: always
     ports:
@@ -87,7 +111,7 @@ services:
 # -------------------------------------------------------------------------- #
 
   nats:
-    image: nats:latest
+    image: nats:alpine
     container_name: nats
     command: -V --http_port 8222 --user admin --pass admin -js -sd /data
     ports:
@@ -109,7 +133,7 @@ services:
       - host.docker.internal=host-gateway
 
 # -------------------------------------------------------------------------- #
-# MARK:ClickHouse
+# MARK:clickhouse
 # -------------------------------------------------------------------------- #
     
   clickhouse:
@@ -126,7 +150,7 @@ services:
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
       CLICKHOUSE_LOG_LEVEL: trace
     volumes:
-      - chdb:/var/lib/clickhouse:rw
+      - ~/.environment/clickhouse/db:/var/lib/clickhouse:rw
       - ~/.environment/clickhouse/log:/var/log/clickhouse-server
     extra_hosts:
       - host.docker.internal=host-gateway
@@ -145,7 +169,3 @@ services:
 networks:
   default:
     enable_ipv6: false
-
-volumes:
-  chdb:
-    driver: local
