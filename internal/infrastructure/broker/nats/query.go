@@ -1,19 +1,23 @@
 package bnats
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+
+	"github.com/0LuigiCode0/hezzl/internal/domain/consts"
+	"github.com/nats-io/nats.go"
 )
 
-func push[T any](n *_nats, sub string, in T) error {
+func pushStream(s *_stream, ctx context.Context, subj string, in any) error {
 	data, err := json.Marshal(in)
 	if err != nil {
-		return fmt.Errorf("ошибка маршала в json: %w", err)
+		return fmt.Errorf(consts.ErrJsonMarshal, err)
 	}
 
-	err = n.conn.Publish(sub, data)
+	_, err = s.js.Publish(subj, data, nats.Context(ctx))
 	if err != nil {
-		return fmt.Errorf("ошибка отправки сообщения в топик %s: %w", sub, err)
+		return fmt.Errorf(errPush, subj, err)
 	}
 
 	return nil

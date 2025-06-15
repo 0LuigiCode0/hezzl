@@ -2,7 +2,6 @@ package rclickhouse
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"log"
 
@@ -17,17 +16,19 @@ type _clickhouse struct {
 	conn driver.Conn
 }
 
-type IClickHouse interface{}
+type IClickHouse interface {
+	InsertGoodsLogBatch(ctx context.Context) (IBatch, error)
+}
 
 func InitClickHouse(ctx context.Context) (IClickHouse, error) {
 	clConn, err := clickhouse.Open(&clickhouse.Options{
+		// Protocol: clickhouse.Native,
 		Addr: []string{config.Cfg.ClickHouse.Addr},
 		Auth: clickhouse.Auth{
 			Database: config.Cfg.ClickHouse.DB,
 			Username: config.Cfg.ClickHouse.User,
 			Password: config.Cfg.ClickHouse.Pwd,
 		},
-		TLS: &tls.Config{InsecureSkipVerify: true},
 	})
 	if err != nil {
 		return nil, fmt.Errorf(consts.ErrOpenConnect, err)

@@ -1,16 +1,18 @@
 package ihttp
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/0LuigiCode0/hezzl/config"
 	"github.com/0LuigiCode0/hezzl/internal/domain/conv"
 	dhttp "github.com/0LuigiCode0/hezzl/internal/domain/http"
 	dpostgres "github.com/0LuigiCode0/hezzl/internal/domain/postgres"
 )
 
-func (h *handler) createGood(w http.ResponseWriter, r *http.Request) {
+func (h *_handler) createGood(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	projectID, err := strconv.Atoi(r.URL.Query().Get("projectId"))
@@ -35,19 +37,22 @@ func (h *handler) createGood(w http.ResponseWriter, r *http.Request) {
 		Name:      data.Name,
 	})
 	if err != nil {
-		writeErrorFLog(w, 500, errInsertGood, err)
+		writeErrorLog(w, 500, err)
 		return
 	}
 
-	err = h.nats.Push(conv.GoodPgToCh(good))
-	if err != nil {
-		log.Printf(errInsertLog, "creteGood", err)
-	}
+	h.withRetry(config.Cfg.Nats.RetryCount, func(ctx context.Context) error {
+		err = h.nats.PushGoodsLog(ctx, conv.GoodPgToCh(good))
+		if err != nil {
+			log.Print("creteGood", err)
+		}
+		return err
+	})
 
 	writeJson(w, 200, conv.GoodPgToResp(good))
 }
 
-func (h *handler) updateGood(w http.ResponseWriter, r *http.Request) {
+func (h *_handler) updateGood(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -73,7 +78,7 @@ func (h *handler) updateGood(w http.ResponseWriter, r *http.Request) {
 		Name:        data.Name,
 	})
 	if err != nil {
-		writeErrorFLog(w, 500, errUpdateGood, err)
+		writeErrorLog(w, 500, err)
 		return
 	}
 	if good == nil {
@@ -81,15 +86,18 @@ func (h *handler) updateGood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.nats.Push(conv.GoodPgToCh(good))
-	if err != nil {
-		log.Printf(errInsertLog, "updateGood", err)
-	}
+	h.withRetry(config.Cfg.Nats.RetryCount, func(ctx context.Context) error {
+		err = h.nats.PushGoodsLog(ctx, conv.GoodPgToCh(good))
+		if err != nil {
+			log.Print("updateGood", err)
+		}
+		return err
+	})
 
 	writeJson(w, 200, conv.GoodPgToResp(good))
 }
 
-func (h *handler) removeGood(w http.ResponseWriter, r *http.Request) {
+func (h *_handler) removeGood(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -100,7 +108,7 @@ func (h *handler) removeGood(w http.ResponseWriter, r *http.Request) {
 
 	good, err := h.pg.RemoveGood(r.Context(), id)
 	if err != nil {
-		writeErrorFLog(w, 500, errRemoveGood, err)
+		writeErrorLog(w, 500, err)
 		return
 	}
 	if good == nil {
@@ -108,15 +116,18 @@ func (h *handler) removeGood(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.nats.Push(conv.GoodPgToCh(good))
-	if err != nil {
-		log.Printf(errInsertLog, "removeGood", err)
-	}
+	h.withRetry(config.Cfg.Nats.RetryCount, func(ctx context.Context) error {
+		err = h.nats.PushGoodsLog(ctx, conv.GoodPgToCh(good))
+		if err != nil {
+			log.Print("removeGood", err)
+		}
+		return err
+	})
 
 	writeJson(w, 200, conv.GoodPgToRemoveResp(good))
 }
 
-func (h *handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
+func (h *_handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
@@ -132,12 +143,12 @@ func (h *handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
 
 	goods, err := h.pg.GetGoods(r.Context(), limit, offset)
 	if err != nil {
-		writeErrorFLog(w, 500, errGetGoods, err)
+		writeErrorLog(w, 500, err)
 		return
 	}
 	meta, err := h.pg.GetGoodsMeta(r.Context())
 	if err != nil {
-		writeErrorFLog(w, 500, errGetGoods, err)
+		writeErrorLog(w, 500, err)
 		return
 	}
 

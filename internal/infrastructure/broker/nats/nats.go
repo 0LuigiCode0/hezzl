@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/0LuigiCode0/hezzl/config"
-	dclickhouse "github.com/0LuigiCode0/hezzl/internal/domain/clickhouse"
+	"github.com/0LuigiCode0/hezzl/internal/domain/consts"
 	"github.com/0LuigiCode0/hezzl/internal/utils"
 	"github.com/nats-io/nats.go"
 )
@@ -16,7 +16,8 @@ type _nats struct {
 }
 
 type INats interface {
-	Push(v *dclickhouse.LogEventGood) error
+	CreateStream(ctx context.Context, name string, subs ...string) (IStream, error)
+	ConnectStream(ctx context.Context, name string) (IStream, error)
 }
 
 func InitNats(ctx context.Context) (INats, error) {
@@ -25,7 +26,7 @@ func InitNats(ctx context.Context) (INats, error) {
 		nats.UserInfo(config.Cfg.Nats.User, config.Cfg.Nats.Pwd),
 		nats.Name(config.ServiceName))
 	if err != nil {
-		return nil, fmt.Errorf("ошибка подключения: %w", err)
+		return nil, fmt.Errorf(consts.ErrOpenConnect, err)
 	}
 
 	utils.AddShutdown(func() {

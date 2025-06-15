@@ -8,7 +8,7 @@ import (
 	"os/signal"
 
 	"github.com/0LuigiCode0/hezzl/config"
-	"github.com/0LuigiCode0/hezzl/internal/infrastructure/service"
+	goodmananger "github.com/0LuigiCode0/hezzl/internal/infrastructure/service/goods_manager"
 )
 
 func main() {
@@ -25,6 +25,6 @@ func main() {
 	ctx, close := signal.NotifyContext(context.Background(), os.Kill, os.Interrupt)
 	defer close()
 
-	service.Start(ctx)
+	goodmananger.Start(ctx)
 	log.Print("сервер остановлен")
 }

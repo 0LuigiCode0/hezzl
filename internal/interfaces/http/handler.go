@@ -1,17 +1,22 @@
 package ihttp
 
 import (
+	"context"
 	"net/http"
+	"sync"
 
 	bnats "github.com/0LuigiCode0/hezzl/internal/infrastructure/broker/nats"
 	rpostgres "github.com/0LuigiCode0/hezzl/internal/infrastructure/repository/postgres"
 	rredis "github.com/0LuigiCode0/hezzl/internal/infrastructure/repository/redis"
 )
 
-type handler struct {
+type _handler struct {
+	wg  sync.WaitGroup
+	ctx context.Context
+
 	pg    rpostgres.IRepoPostgres
 	redis rredis.IRedis
-	nats  bnats.INats
+	nats  bnats.IStream
 }
 
 const (
@@ -21,8 +26,8 @@ const (
 	urlGoodList   = "GET /goods/list"
 )
 
-func InitHandler(pg rpostgres.IRepoPostgres, redis rredis.IRedis, nats bnats.INats) http.Handler {
-	handler := new(handler)
+func InitHandler(pg rpostgres.IRepoPostgres, redis rredis.IRedis, nats bnats.IStream) http.Handler {
+	handler := new(_handler)
 	handler.pg = pg
 	handler.redis = redis
 	handler.nats = nats

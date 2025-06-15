@@ -8,5 +8,9 @@ const (
 	errSelect  = "ошибка select: %w"
 	errScanRow = "ошибка скана строки: %w"
 
-	errExec = "ошибка выполнения команды: %w"
+	errInsertGood   = "ошибка записи товара: %w"
+	errUpdateGood   = "ошибка обновления товара: %w"
+	errRemoveGood   = "ошибка удаления товара: %w"
+	errGetGoods     = "ошибка поиска товаров: %w"
+	errGetGoodsMeta = "ошибка поиска статистики товаров: %w"
 )

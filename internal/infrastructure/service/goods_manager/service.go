@@ -1,10 +1,11 @@
-package service
+package goodmananger
 
 import (
 	"context"
 	"log"
 	"net"
 	"net/http"
+	"sync"
 
 	"github.com/0LuigiCode0/hezzl/config"
 
@@ -16,6 +17,8 @@ import (
 )
 
 func Start(ctx context.Context) {
+	wg := sync.WaitGroup{}
+	defer wg.Wait()
 	defer utils.Shutdown()
 
 	repoPostgres, err := rpostgres.InitRepoPostgres(ctx)
@@ -23,12 +26,6 @@ func Start(ctx context.Context) {
 		log.Printf("ошибка инициализации postgres: %s", err)
 		return
 	}
-
-	// repoClickHouse, err := repoclickhouse.InitClickHouse(ctx)
-	// if err != nil {
-	// 	log.Printf("ошибка инициализации clickhouse: %w", err)
-	// 	return
-	// }
 
 	repoRedis, err := rredis.InitRedis(ctx)
 	if err != nil {
@@ -41,8 +38,13 @@ func Start(ctx context.Context) {
 		log.Printf("ошибка инициализации nats: %s", err)
 		return
 	}
+	natsStream, err := brokerNats.ConnectStream(ctx, config.Cfg.Nats.Stream)
+	if err != nil {
+		log.Printf("ошибка подключения к стриму %s nats: %s", config.Cfg.Nats.Stream, err)
+		return
+	}
 
-	handler := ihttp.InitHandler(repoPostgres, repoRedis, brokerNats)
+	handler := ihttp.InitHandler(repoPostgres, repoRedis, natsStream)
 
 	l, err := net.ListenTCP("tcp4", &net.TCPAddr{Port: config.Cfg.Port})
 	if err != nil {
@@ -57,7 +59,9 @@ func Start(ctx context.Context) {
 		}
 	})
 
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		if err := http.Serve(l, handler); err != nil {
 			log.Printf("ошибка обработчика запросов: %s", err)
 		}

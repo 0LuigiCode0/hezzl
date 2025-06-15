@@ -89,7 +89,7 @@ services:
   nats:
     image: nats:latest
     container_name: nats
-    command: "-V --http_port 8222 --user admin --pass admin --sd /data -js -sd /data"
+    command: -V --http_port 8222 --user admin --pass admin -js -sd /data
     ports:
       - "4222:4222"
       - "8222:8222"
@@ -104,6 +104,7 @@ services:
       - "8083:31311"
     volumes:
       - ~/.environment/nats/ui:/data
+      - ~/.environment/nats/ui/db:/db
     extra_hosts:
       - host.docker.internal=host-gateway
 

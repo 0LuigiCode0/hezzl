@@ -38,23 +38,6 @@ func jsonGet[T any](r *redis.Client, ctx context.Context, key string, path strin
 	return out, nil
 }
 
-func jsonGetList[T any](r *redis.Client, ctx context.Context, path string, keys ...string) ([]*T, error) {
-	res := r.JSONMGet(ctx, path, keys...)
-	if res.Err() != nil {
-		return nil, fmt.Errorf(errRead, res.Err())
-	}
-
-	out := make([]*T, len(res.Val()))
-	for i, v := range res.Val() {
-		err := json.Unmarshal([]byte(v.(string)), out[i])
-		if err != nil {
-			return nil, fmt.Errorf(consts.ErrJsonUnmarshal, err)
-		}
-	}
-
-	return out, nil
-}
-
 func jsonDelete(r *redis.Client, ctx context.Context, key string, path string) error {
 	res := r.JSONDel(ctx, key, path)
 	if res.Err() != nil {

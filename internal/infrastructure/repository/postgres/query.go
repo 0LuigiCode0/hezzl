@@ -39,12 +39,3 @@ func queryRows[T any](db _IConn, ctx context.Context, query string, arg ...any) 
 
 	return out, nil
 }
-
-func exec(db _IConn, ctx context.Context, query string, arg ...any) (bool, error) {
-	res, err := db.Exec(ctx, query, arg...)
-	if err != nil {
-		return false, fmt.Errorf(errExec, err)
-	}
-
-	return res.RowsAffected() > 0, nil
-}

@@ -39,3 +39,10 @@ func writeErrorFLog(w http.ResponseWriter, statusCode int, format string, arg ..
 	w.WriteHeader(statusCode)
 	w.Write([]byte(err.Error()))
 }
+
+func writeErrorLog(w http.ResponseWriter, statusCode int, err error) {
+	log.Print(err)
+
+	w.WriteHeader(statusCode)
+	w.Write([]byte(err.Error()))
+}
