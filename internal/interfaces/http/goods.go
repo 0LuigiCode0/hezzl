@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/0LuigiCode0/hezzl/config"
+	"github.com/0LuigiCode0/hezzl/internal/domain/consts"
 	"github.com/0LuigiCode0/hezzl/internal/domain/conv"
 	dhttp "github.com/0LuigiCode0/hezzl/internal/domain/http"
 	dpostgres "github.com/0LuigiCode0/hezzl/internal/domain/postgres"
@@ -17,18 +18,22 @@ func (h *_handler) createGood(w http.ResponseWriter, r *http.Request) {
 
 	projectID, err := strconv.Atoi(r.URL.Query().Get("projectId"))
 	if err != nil {
-		writeErrorFLog(w, 400, errParseParam, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseParam, err)
+		return
+	}
+	if projectID <= 0 {
+		writeErrorFLog(w, http.StatusBadRequest, consts.ErrFieldValid, "projectId")
 		return
 	}
 
 	data, err := jsonParse[dhttp.CreateGoodReq](r.Body)
 	if err != nil {
-		writeErrorFLog(w, 400, errParseBody, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseBody, err)
 		return
 	}
 	err = data.Validate()
 	if err != nil {
-		writeErrorFLog(w, 400, errParseBody, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseBody, err)
 		return
 	}
 
@@ -37,7 +42,7 @@ func (h *_handler) createGood(w http.ResponseWriter, r *http.Request) {
 		Name:      data.Name,
 	})
 	if err != nil {
-		writeErrorLog(w, 500, err)
+		writeErrorLog(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -49,7 +54,7 @@ func (h *_handler) createGood(w http.ResponseWriter, r *http.Request) {
 		return err
 	})
 
-	writeJson(w, 200, conv.GoodPgToResp(good))
+	writeJson(w, http.StatusOK, conv.GoodPgToResp(good))
 }
 
 func (h *_handler) updateGood(w http.ResponseWriter, r *http.Request) {
@@ -57,18 +62,22 @@ func (h *_handler) updateGood(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
-		writeErrorFLog(w, 400, errParseParam, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseParam, err)
+		return
+	}
+	if id <= 0 {
+		writeErrorFLog(w, http.StatusBadRequest, consts.ErrFieldValid, "id")
 		return
 	}
 
 	data, err := jsonParse[dhttp.UpdateGoodReq](r.Body)
 	if err != nil {
-		writeErrorFLog(w, 400, errParseBody, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseBody, err)
 		return
 	}
 	err = data.Validate()
 	if err != nil {
-		writeErrorFLog(w, 400, errParseBody, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseBody, err)
 		return
 	}
 
@@ -78,11 +87,11 @@ func (h *_handler) updateGood(w http.ResponseWriter, r *http.Request) {
 		Name:        data.Name,
 	})
 	if err != nil {
-		writeErrorLog(w, 500, err)
+		writeErrorLog(w, http.StatusInternalServerError, err)
 		return
 	}
 	if good == nil {
-		writeJson(w, 404, dhttp.NewError(3, errNotFound, nil))
+		writeJson(w, http.StatusNotFound, dhttp.NewError(3, errNotFound, nil))
 		return
 	}
 
@@ -101,7 +110,7 @@ func (h *_handler) updateGood(w http.ResponseWriter, r *http.Request) {
 		return err
 	})
 
-	writeJson(w, 200, conv.GoodPgToResp(good))
+	writeJson(w, http.StatusOK, conv.GoodPgToResp(good))
 }
 
 func (h *_handler) removeGood(w http.ResponseWriter, r *http.Request) {
@@ -109,17 +118,21 @@ func (h *_handler) removeGood(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
-		writeErrorFLog(w, 400, errParseParam, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseParam, err)
+		return
+	}
+	if id <= 0 {
+		writeErrorFLog(w, http.StatusBadRequest, consts.ErrFieldValid, "id")
 		return
 	}
 
 	good, err := h.pg.RemoveGood(r.Context(), id)
 	if err != nil {
-		writeErrorLog(w, 500, err)
+		writeErrorLog(w, http.StatusInternalServerError, err)
 		return
 	}
 	if good == nil {
-		writeJson(w, 404, dhttp.NewError(3, errNotFound, nil))
+		writeJson(w, http.StatusNotFound, dhttp.NewError(3, errNotFound, nil))
 		return
 	}
 
@@ -138,7 +151,7 @@ func (h *_handler) removeGood(w http.ResponseWriter, r *http.Request) {
 		return err
 	})
 
-	writeJson(w, 200, conv.GoodPgToRemoveResp(good))
+	writeJson(w, http.StatusOK, conv.GoodPgToRemoveResp(good))
 }
 
 func (h *_handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
@@ -146,15 +159,14 @@ func (h *_handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
 
 	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
 	if err != nil {
-		writeErrorFLog(w, 400, errParseParam, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseParam, err)
 		return
 	}
 	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
 	if err != nil {
-		writeErrorFLog(w, 400, errParseParam, err)
+		writeErrorFLog(w, http.StatusBadRequest, errParseParam, err)
 		return
 	}
-
 	if limit <= 0 {
 		limit = 10
 	}
@@ -169,7 +181,7 @@ func (h *_handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
 
 		goods, err = h.pg.GetGoods(r.Context(), limit, offset)
 		if err != nil {
-			writeErrorLog(w, 500, err)
+			writeErrorLog(w, http.StatusInternalServerError, err)
 			return
 		}
 		isDB = true
@@ -177,7 +189,7 @@ func (h *_handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
 
 	meta, err := h.pg.GetGoodsMeta(r.Context())
 	if err != nil {
-		writeErrorLog(w, 500, err)
+		writeErrorLog(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -191,5 +203,5 @@ func (h *_handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	writeJson(w, 200, conv.GoodsPgToRespMeta(meta, goods, limit, offset))
+	writeJson(w, http.StatusOK, conv.GoodsPgToRespMeta(meta, goods, limit, offset))
 }

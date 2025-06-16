@@ -1,11 +1,9 @@
 package rredis
 
 import (
-	"crypto/sha1"
 	"strings"
 )
 
-func hashKey(args ...string) string {
-	hash := sha1.Sum([]byte(strings.Join(args, "_")))
-	return string(hash[:])
+func buildKey(args ...string) string {
+	return strings.Join(args, "_")
 }

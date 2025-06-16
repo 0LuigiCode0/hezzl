@@ -12,12 +12,12 @@ type _batch struct {
 }
 
 type IBatch interface {
-	AppendStruct(v _IprepareBatch) error
+	AppendStruct(v IPrepareBatch) error
 	Append(v ...any) error
 	Send() error
 }
 
-type _IprepareBatch interface {
+type IPrepareBatch interface {
 	PrepareBatch() []any
 }
 
@@ -47,7 +47,7 @@ func (b *_batch) Append(v ...any) error {
 	return nil
 }
 
-func (b *_batch) AppendStruct(v _IprepareBatch) error {
+func (b *_batch) AppendStruct(v IPrepareBatch) error {
 	err := b.b.Append(v.PrepareBatch()...)
 	if err != nil {
 		return fmt.Errorf(errBatchAppend, err)

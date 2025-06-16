@@ -11,7 +11,7 @@ const (
 )
 
 const (
-	ErrFieldEmpty = "поле %s пустое"
+	ErrFieldValid = "поле %s невалидно"
 )
 
 const (

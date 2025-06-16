@@ -10,9 +10,9 @@ import (
 )
 
 func (r *_redis) PushGoods(ctx context.Context, limit, offset int, goods []*dpostgres.Good) error {
-	key := hashKey(strconv.Itoa(limit), strconv.Itoa(offset))
-	tx := r.conn.TxPipeline()
+	key := buildKey(strconv.Itoa(limit), strconv.Itoa(offset))
 
+	tx := r.conn.TxPipeline()
 	err := jsonSet(tx, ctx, key, ".", goods, config.Cfg.Redis.Expire)
 	if err != nil {
 		tx.Discard()
@@ -36,7 +36,7 @@ func (r *_redis) PushGoods(ctx context.Context, limit, offset int, goods []*dpos
 }
 
 func (r *_redis) GetGoods(ctx context.Context, limit, offset int) ([]*dpostgres.Good, error) {
-	key := hashKey(strconv.Itoa(limit), strconv.Itoa(offset))
+	key := buildKey(strconv.Itoa(limit), strconv.Itoa(offset))
 
 	res, err := jsonGet[[]*dpostgres.Good](r.conn, ctx, key, ".", config.Cfg.Redis.Expire)
 	if err != nil || res == nil {

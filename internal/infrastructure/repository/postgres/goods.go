@@ -21,6 +21,7 @@ func (r *_repo) GetGoods(ctx context.Context, limit, offset int) ([]*dpostgres.G
 	if err != nil {
 		return nil, fmt.Errorf(errGetGoods, err)
 	}
+
 	return res, nil
 }
 
@@ -29,6 +30,7 @@ func (r *_repo) GetGoodsMeta(ctx context.Context) (*dpostgres.Meta, error) {
 	if err != nil {
 		return nil, fmt.Errorf(errGetGoods, err)
 	}
+
 	return res, nil
 }
 
@@ -40,6 +42,7 @@ func (r *_repo) InsertGood(ctx context.Context, in *dpostgres.InsertGood) (*dpos
 	if err != nil {
 		return nil, fmt.Errorf(errGetGoods, err)
 	}
+
 	return res, nil
 }
 
@@ -52,6 +55,7 @@ func (r *_repo) UpdateGood(ctx context.Context, in *dpostgres.UpdateGood) (*dpos
 	if err != nil {
 		return nil, fmt.Errorf(errGetGoods, err)
 	}
+
 	return res, nil
 }
 
@@ -60,5 +64,6 @@ func (r *_repo) RemoveGood(ctx context.Context, id int) (*dpostgres.Good, error)
 	if err != nil {
 		return nil, fmt.Errorf(errGetGoods, err)
 	}
+
 	return res, nil
 }

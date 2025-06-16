@@ -12,15 +12,18 @@ import (
 type Config struct {
 	ServiceName string `json:"service_name" env:"PROXY_SERVICE_NAME" env-default:"goods-manager"`
 	Port        int    `json:"port" env:"PROXY_PORT" env-default:"90"`
-	Postgres    struct {
+
+	Postgres struct {
 		URL string `json:"url" env:"PROXY_PG_URL" env-default:"postgres://admin:admin@host.docker.internal:5432/test"`
 	} `json:"postgres"`
+
 	ClickHouse struct {
 		Addr string `json:"addr" env:"PROXY_CH_ADDR" env-default:"host.docker.internal:9000"`
 		User string `json:"user" env:"PROXY_CH_USER" env-default:"admin"`
 		Pwd  string `json:"pwd" env:"PROXY_CH_PWD" env-default:"admin"`
 		DB   string `json:"db" env:"PROXY_CH_DB" env-default:"test"`
 	}
+
 	Nats struct {
 		Addr string `json:"addr" env:"PROXY_NATS_ADDR" env-default:"nats://host.docker.internal:4222"`
 		User string `json:"user" env:"PROXY_NATS_USER" env-default:"admin"`
@@ -33,6 +36,7 @@ type Config struct {
 		Delay      time.Duration `json:"delay" env:"PROXY_NATS_DELAY" env-default:"10s"`
 		RetryCount int           `json:"retry_count" env:"PROXY_NATS_RETRY_COUNT" env-default:"4"`
 	}
+
 	Redis struct {
 		MasterName   string `json:"master_name" env:"PROXY_REDIS_MASTER_NAME" env-default:"mymaster"`
 		SentinelAddr string `json:"sentinel_addr" env:"PROXY_REDIS_SENTINEL_ADDR" env-default:"host.docker.internal:26379"`

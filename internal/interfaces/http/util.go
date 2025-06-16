@@ -34,14 +34,14 @@ func writeJson(w http.ResponseWriter, statusCode int, data any) {
 
 func writeErrorFLog(w http.ResponseWriter, statusCode int, format string, arg ...any) {
 	err := fmt.Errorf(format, arg...)
-	log.Print(err)
+	log.Print(prefix, err)
 
 	w.WriteHeader(statusCode)
 	w.Write([]byte(err.Error()))
 }
 
 func writeErrorLog(w http.ResponseWriter, statusCode int, err error) {
-	log.Print(err)
+	log.Print(prefix, err)
 
 	w.WriteHeader(statusCode)
 	w.Write([]byte(err.Error()))
