@@ -17,8 +17,9 @@ func NewError(code int, msg string, err error, details ErrorDetails) *ErrorResp 
 		details = make(ErrorDetails)
 	}
 	if err != nil {
-		details["err"] = err
+		details["err"] = err.Error()
 	}
+
 	return &ErrorResp{
 		Code:    code,
 		Msg:     msg,

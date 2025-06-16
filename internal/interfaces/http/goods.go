@@ -24,7 +24,7 @@ func (h *_handler) createGood(w http.ResponseWriter, r *http.Request) {
 
 	good, errResp := h.usecase.CreateGood(r.Context(), projectID, data)
 	if errResp != nil {
-		writeErrorLog(w, dusecase.NewError(http.StatusInternalServerError, errResp.Msg, err, nil))
+		writeErrorLog(w, errResp)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (h *_handler) updateGood(w http.ResponseWriter, r *http.Request) {
 
 	good, errResp := h.usecase.UpdateGood(r.Context(), id, data)
 	if errResp != nil {
-		writeErrorLog(w, dusecase.NewError(http.StatusInternalServerError, errResp.Msg, err, nil))
+		writeErrorLog(w, errResp)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (h *_handler) removeGood(w http.ResponseWriter, r *http.Request) {
 
 	good, errResp := h.usecase.RemoveGood(r.Context(), id)
 	if errResp != nil {
-		writeErrorLog(w, dusecase.NewError(http.StatusInternalServerError, errResp.Msg, err, nil))
+		writeErrorLog(w, errResp)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (h *_handler) getGoodsList(w http.ResponseWriter, r *http.Request) {
 
 	goods, errResp := h.usecase.GetGoodsList(r.Context(), limit, offset)
 	if errResp != nil {
-		writeErrorLog(w, dusecase.NewError(http.StatusInternalServerError, errResp.Msg, err, nil))
+		writeErrorLog(w, errResp)
 		return
 	}
 

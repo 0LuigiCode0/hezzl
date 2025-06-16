@@ -135,7 +135,6 @@ services:
 # -------------------------------------------------------------------------- #
 # MARK:clickhouse
 # -------------------------------------------------------------------------- #
-    
   clickhouse:
     image: clickhouse:latest
     container_name: clickhouse
@@ -150,7 +149,7 @@ services:
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
       CLICKHOUSE_LOG_LEVEL: trace
     volumes:
-      - ~/.environment/clickhouse/db:/var/lib/clickhouse:rw
+      - chdb:/var/lib/clickhouse
       - ~/.environment/clickhouse/log:/var/log/clickhouse-server
     extra_hosts:
       - host.docker.internal=host-gateway
@@ -169,3 +168,7 @@ services:
 networks:
   default:
     enable_ipv6: false
+
+volumes:
+  chdb:
+    driver: local
