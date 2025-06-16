@@ -1,4 +1,4 @@
-package dhttp
+package dusecase
 
 import (
 	"errors"
@@ -23,7 +23,7 @@ type (
 		Offset  int `json:"offset"`
 	}
 	GetGoodsResp struct {
-		Meta  Meta        `json:"meta"`
+		Meta  *Meta       `json:"meta"`
 		Goods []*GoodResp `json:"goods"`
 	}
 )

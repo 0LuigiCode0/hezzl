@@ -13,6 +13,7 @@ type _stream struct {
 	js nats.JetStreamContext
 }
 
+//go:generate mockery --name IStream --outpkg mnats --recursive --with-expecter
 type IStream interface {
 	Subscribe(ctx context.Context, subj string, nameClient string) (IConsumer, error)
 

@@ -16,6 +16,7 @@ type _redis struct {
 	conn *redis.Client
 }
 
+//go:generate mockery --name IRedis --outpkg mredis --recursive --with-expecter
 type IRedis interface {
 	PushGoods(ctx context.Context, limit, offset int, goods []*dpostgres.Good) error
 	GetGoods(ctx context.Context, limit, offset int) ([]*dpostgres.Good, error)

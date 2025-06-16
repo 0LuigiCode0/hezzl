@@ -36,6 +36,7 @@ type _postgres struct {
 	conn *pgx.Conn
 }
 
+//go:generate mockery --name IRepoPostgres --outpkg mpostgres --recursive --with-expecter
 type IRepoPostgres interface {
 	_IRepo
 

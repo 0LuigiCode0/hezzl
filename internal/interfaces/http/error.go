@@ -1,11 +1,10 @@
 package ihttp
 
 const (
-	prefix = "[router] "
+	prefix = "[http] "
 
-	errNotFound   = "errors.common.notFound"
-	errParseBody  = "ошибка парса тела: %s"
-	errParseParam = "ошибка парса параметра: %s"
+	errParseBody  = "ошибка парса тела"
+	errParseParam = "ошибка парса параметра"
 
 	errReadBody = "ошибка чтения тела: %w"
 )

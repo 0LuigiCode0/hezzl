@@ -1,20 +1,20 @@
-package ihttp
+package usecase
 
 import (
 	"context"
 	"time"
 )
 
-func (h *_handler) withRetry(count int, f func(ctx context.Context) error) {
-	h.wg.Add(1)
+func (u *_usecase) withRetry(count int, f func(ctx context.Context) error) {
+	u.wg.Add(1)
 	go func() {
-		defer h.wg.Done()
+		defer u.wg.Done()
 		for i := range count {
 			select {
-			case <-h.ctx.Done():
+			case <-u.ctx.Done():
 				return
 			case <-time.After(time.Second * time.Duration(i*i)):
-				err := f(h.ctx)
+				err := f(u.ctx)
 				if err == nil {
 					return
 				}

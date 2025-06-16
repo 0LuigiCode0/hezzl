@@ -2,6 +2,7 @@
 
 tool-install:
 	go install github.com/pressly/goose/v3/cmd/goose@latest
+	go install github.com/vektra/mockery/v2@v2.53.0
 	
 pg-up:
 	goose -dir ./migration/pg postgres "postgres://admin:admin@host.docker.internal:5432/test" up 

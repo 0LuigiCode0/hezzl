@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/0LuigiCode0/hezzl/internal/domain/consts"
+	dusecase "github.com/0LuigiCode0/hezzl/internal/domain/usecase"
 )
 
 func jsonParse[T any](data io.Reader) (*T, error) {
@@ -23,8 +24,12 @@ func jsonParse[T any](data io.Reader) (*T, error) {
 func writeJson(w http.ResponseWriter, statusCode int, data any) {
 	payload, err := json.Marshal(data)
 	if err != nil {
-		writeErrorFLog(w, 500, consts.ErrJsonMarshal, err)
-		return
+		errResp := dusecase.NewError(500, consts.ErrJsonMarshal, err, nil)
+		log.Print(errResp)
+		payload, err = json.Marshal(errResp)
+		if err != nil {
+			return
+		}
 	}
 
 	w.Header().Add("Content-Type", "application/json")
@@ -32,17 +37,17 @@ func writeJson(w http.ResponseWriter, statusCode int, data any) {
 	w.Write(payload)
 }
 
-func writeErrorFLog(w http.ResponseWriter, statusCode int, format string, arg ...any) {
-	err := fmt.Errorf(format, arg...)
+func writeErrorLog(w http.ResponseWriter, err *dusecase.ErrorResp) {
 	log.Print(prefix, err)
 
-	w.WriteHeader(statusCode)
-	w.Write([]byte(err.Error()))
+	writeJson(w, mapCode(err.Code), err)
 }
 
-func writeErrorLog(w http.ResponseWriter, statusCode int, err error) {
-	log.Print(prefix, err)
-
-	w.WriteHeader(statusCode)
-	w.Write([]byte(err.Error()))
+func mapCode(code int) int {
+	switch code {
+	case 3:
+		return http.StatusNotFound
+	default:
+		return code
+	}
 }

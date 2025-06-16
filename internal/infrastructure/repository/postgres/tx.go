@@ -13,6 +13,7 @@ type _tx struct {
 	tx pgx.Tx
 }
 
+//go:generate mockery --name ITx --outpkg mpostgres --recursive --with-expecter
 type ITx interface {
 	_IRepo
 

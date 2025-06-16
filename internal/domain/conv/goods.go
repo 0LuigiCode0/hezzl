@@ -1,11 +1,10 @@
 package conv
 
 import (
-	"time"
-
 	dclickhouse "github.com/0LuigiCode0/hezzl/internal/domain/clickhouse"
-	dhttp "github.com/0LuigiCode0/hezzl/internal/domain/http"
 	dpostgres "github.com/0LuigiCode0/hezzl/internal/domain/postgres"
+	dusecase "github.com/0LuigiCode0/hezzl/internal/domain/usecase"
+	"github.com/0LuigiCode0/hezzl/internal/utils"
 )
 
 func convArr[In, Out any](in []In, f func(In) Out) []Out {
@@ -25,12 +24,12 @@ func GoodPgToCh(in *dpostgres.Good) *dclickhouse.LogEventGood {
 		Description: in.Description,
 		Priority:    in.Priority,
 		Removed:     in.Removed,
-		EventTime:   time.Now(),
+		EventTime:   utils.TimeNow(),
 	}
 }
 
-func GoodPgToResp(in *dpostgres.Good) *dhttp.GoodResp {
-	return &dhttp.GoodResp{
+func GoodPgToResp(in *dpostgres.Good) *dusecase.GoodResp {
+	return &dusecase.GoodResp{
 		Id:          in.Id,
 		ProjectId:   in.ProjectId,
 		Name:        in.Name,
@@ -41,17 +40,17 @@ func GoodPgToResp(in *dpostgres.Good) *dhttp.GoodResp {
 	}
 }
 
-func GoodPgToRemoveResp(in *dpostgres.Good) *dhttp.RemoveGoodResp {
-	return &dhttp.RemoveGoodResp{
+func GoodPgToRemoveResp(in *dpostgres.Good) *dusecase.RemoveGoodResp {
+	return &dusecase.RemoveGoodResp{
 		Id:        in.Id,
 		ProjectId: in.ProjectId,
 		Removed:   in.Removed,
 	}
 }
 
-func GoodsPgToRespMeta(meta *dpostgres.Meta, goods []*dpostgres.Good, limit, offset int) *dhttp.GetGoodsResp {
-	return &dhttp.GetGoodsResp{
-		Meta: dhttp.Meta{
+func GoodsPgToRespMeta(meta *dpostgres.Meta, goods []*dpostgres.Good, limit, offset int) *dusecase.GetGoodsResp {
+	return &dusecase.GetGoodsResp{
+		Meta: &dusecase.Meta{
 			Total:   meta.Total,
 			Removed: meta.Removed,
 			Limit:   limit,

@@ -16,6 +16,7 @@ type _clickhouse struct {
 	conn driver.Conn
 }
 
+//go:generate mockery --name IClickHouse --outpkg mclickhouse --recursive --with-expecter
 type IClickHouse interface {
 	InsertGoodsLogBatch(ctx context.Context) (IBatch, error)
 }
